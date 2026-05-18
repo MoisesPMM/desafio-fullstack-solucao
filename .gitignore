@@ -1,0 +1,36 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.WeatherApp.iml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+.env
+
+# Backend .NET
+backend/**/bin/
+backend/**/obj/
+
+# Rider
+backend/.idea/
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# Tests
+tests/**/bin/
+tests/**/obj/

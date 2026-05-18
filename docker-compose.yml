@@ -1,0 +1,51 @@
+services:
+  db:
+    container_name: appclima-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: weatherapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    container_name: appclima-api
+    image: moisespedro/desafioappclima-api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=weatherapp;Username=postgres;Password=postgres
+      - WeatherProvider__ApiKey=${WEATHER_API_KEY:-fake}
+      - FeatureFlags__UseFakeProvider=${USE_FAKE_PROVIDER:-true}
+      - Jwt__Key=${JWT_KEY:-LEMBRAR DE MUDAR CHAVE}
+      - WebSecurity__Login__Usuario=${JWT_USUARIO:-admin}
+      - WebSecurity__Login__Senha=${JWT_SENHA:-LEMBRAR DE MUDAR SENHA}
+      - ASPNETCORE_ENVIRONMENT=Production
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    container_name: appclima-frontend
+    image: moisespedro/desafioappclima-frontend:latest
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  pgdata:

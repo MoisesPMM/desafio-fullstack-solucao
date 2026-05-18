@@ -1,85 +1,243 @@
-# Desafio C# - Aliare
+# WeatherApp — Desafio Fullstack
 
-Quer fazer parte da transformação do campo ~~escrevendo~~ codando o futuro do agronegócio?
+Aplicação full-stack para registro e consulta de temperaturas por cidade ou coordenadas geográficas.
 
-Se deseja participar do nosso processo seletivo, siga as instruções deste desafio e execute os seguintes passos: 
+**Stack:** .NET 8 (C#) · Vue 3 + TypeScript · PostgreSQL · Docker
 
-* Nos mande sua resolução em um *pull request* neste repositório.
+## Visão geral
 
-* Deixe a aplicação disponível publicamente em imagem docker em qualquer host. Na descrição do PR passe o link para que consigamos usar sua imagem.
+O projeto entrega uma API em .NET, um frontend em Vue e um banco PostgreSQL. A forma recomendada de executar a aplicação é **somente com Docker Compose**, sem instalar dependências do backend ou frontend na máquina.
 
-* Por último, caso você ainda não esteja no processo seletivo, envie um email para [murilo.silva@aliare.co](mailto:murilo.silva@aliare.co) com seu CV anexado e o link da aplicação (se já estiver no processo seletivo, não precisa);
+| Serviço | Porta local | Descrição |
+|---|---:|---|
+| Frontend | `3000` | Interface web para autenticação, cadastro e consulta de temperaturas |
+| API | `8080` | API REST em .NET 8 |
+| PostgreSQL | `5432` | Banco de dados usado pela API |
 
-  
+---
 
-# Sobre a Aliare
+## Pré-requisitos
 
-A [Aliare](https://www.aliare.co/) é a maior empresa TECH AGRO do Brasil. Somos a plataforma de cooperação do agronegócio, conectando pessoas, ferramentas e empresas para transformar tempo em produtividade. Existimos para que todos os agentes da cadeia produtiva tenham informações certas, no tempo certo.
+- Docker
+- Docker Compose
+- .NET SDK 8 somente se você quiser executar os testes diretamente na máquina com `dotnet test tests/`
 
-Nascemos do legado de três grandes empresas: Siagri, Datacoper e BTG, movidas pelo desejo de transformar o agronegócio do futuro.
+> Para subir a aplicação, apenas Docker e Docker Compose são necessários.
 
-**Tudo que o agro precisa logo ali.**
+## Imagens Docker Hub:
 
+### API: https://hub.docker.com/r/moisespedro/desafioappclima-api
+### Frontend: https://hub.docker.com/r/moisespedro/desafioappclima-frontend
 
-# O desafio
+## Rodando a aplicação apenas com Docker
 
-O objetivo deste desafio é avaliar sua capacidade de projetar e desenvolver uma aplicação full-stack utilizando .NET 8 (C#) no backend e Vue 3 (TypeScript) no frontend, consumindo uma API REST e persistindo dados em banco relacional.
+### 1. Clone o repositório e acesse a pasta
 
-A aplicação deve permitir que o usuário consulte e registre informações de clima de diferentes localidades, com visualização de histórico.
+```bash
+git clone <url-do-repositorio>
+cd Desafio
+```
 
+### 2. Configure as variáveis de ambiente (opcional)
 
-## Requisitos
-- Registrar temperatura por cidade
+O `docker-compose.yml` já possui valores padrão para subir a aplicação com o provedor simulado de clima (`USE_FAKE_PROVIDER=true`). Assim, é possível testar o projeto sem chave externa da OpenWeatherMap.
 
-  - Deve existir um endpoint que receba o nome da cidade.
-  - A aplicação deve consultar um provedor de clima (ou simulado/fake provider), persistir o resultado no banco de dados e retornar a temperatura atual.
+Se quiser personalizar credenciais ou usar dados reais da OpenWeatherMap, crie um arquivo `.env` na raiz do projeto:
 
-- Registrar temperatura por coordenadas
+```bash
+cp .env.example .env
+```
 
-  - Deve existir um endpoint que receba a latitude e longitude.
-  - A aplicação deve consultar o provedor de clima, persistir o resultado no banco de dados e retornar a temperatura atual.
+Exemplo de `.env` para continuar usando dados simulados:
 
-- Consultar histórico de temperaturas
+```env
+WEATHER_API_KEY=fake
+USE_FAKE_PROVIDER=true
+JWT_KEY=sua_chave_jwt_com_32_bytes_ou_mais
+JWT_USUARIO=admin
+JWT_SENHA=senha_segura_para_jwt32bytes
+```
 
-  - Deve existir um endpoint que receba o nome da cidade ou as coordenadas (lat/long).
-  - O sistema deve retornar o histórico de temperaturas registradas para a localidade nos últimos 30 dias, ordenadas do mais recente para o mais antigo.
+Exemplo de `.env` para usar OpenWeatherMap:
 
-- Interface Web
+```env
+WEATHER_API_KEY=sua_chave_openweathermap
+USE_FAKE_PROVIDER=false
+JWT_KEY=sua_chave_jwt_com_32_bytes_ou_mais
+JWT_USUARIO=admin
+JWT_SENHA=senha_segura_para_jwt32bytes
+```
 
-  - A aplicação deve possuir um frontend em Vue 3 + TypeScript que permita:
-    - Informar o nome da cidade para registrar a leitura de temperatura.
-    - Consultar e visualizar o histórico de temperaturas em lista e em gráfico.
-## Requisitos não funcionais
+> Obtenha uma API key gratuita em: https://openweathermap.org/api
 
-- A aplicação deve ser desenvolvida em .NET 8 (C#) no backend e Vue 3 + TypeScript no frontend.
-- O banco de dados deve ser relacional (PostgreSQL).
-- Deve haver documentação da API via Swagger.
-- O sistema deve expor um health check em /health.
-- O código deve conter testes automatizados (unitários e pelo menos um de integração).
-- A solução deve ser conteinerizada com Docker, com docker-compose.yml para orquestrar API, banco e frontend.
-- O repositório deve conter instruções claras no README.md para execução da aplicação.
+### 3. Suba os containers
 
-- Será considerado ponto extra:
- - Autenticação JWT para endpoints de escrita.
- - Feature flag para troca de provedor de clima.
- - Aplicativo .NET MAUI simples consumindo a API.
- - Pipeline de CI/CD configurado (GitHub Actions).
-  
-Obs.: Não se preocupe com os pontos extras, faça-os se você se sentir confortável e se tiver tempo, consideraremos seu código **desclassificado se seu projeto não estiver funcionando** ou se não tiver os requisitos básicos implementados e funcionais.
+```bash
+docker compose up -d
+```
 
-## Dicas
+Esse comando inicia:
 
-- Você pode usar a API do *[OpenWeatherMaps](https://openweathermap.org)* para buscar dados de temperatura;
-- Certifique-se que sua imagem está funcionando perfeitamente com um simples: `docker run -d --name desafio-csharp -port 5000:5000 [seu_docker_hub]/desafio-csharp`, isso te dará pontos extras;
+- `db`: PostgreSQL 16
+- `api`: backend publicado em imagem Docker
+- `frontend`: aplicação Vue servida pelo Nginx
 
-## Recomendações
+### 4. Acompanhe a inicialização
 
-* Utilize boas práticas de codificação, isso será avaliado;
-* Código limpo, organizado e documentado (quando necessário);
-* Use e abuse de:
-  * SOLID;
-  * Criatividade;
-  * Performance;
-  * Manutenabilidade;
-  * Testes Unitários
-  * ... pois avaliaremos tudo isso!
+```bash
+docker compose ps
+docker compose logs -f api
+```
+
+A API aplica/cria a estrutura do banco automaticamente durante a inicialização.
+
+### 5. Acesse a aplicação
+
+| Recurso | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8080 |
+| Swagger | http://localhost:8080/swagger |
+| Health Check | http://localhost:8080/health |
+
+### 6. Parar a aplicação
+
+```bash
+docker compose down
+```
+
+Para remover também o volume do PostgreSQL e limpar os dados salvos:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## Autenticação
+
+Os endpoints de clima exigem JWT. Pelo frontend, o login usa as credenciais configuradas nas variáveis:
+
+- `JWT_USUARIO`
+- `JWT_SENHA`
+
+Também é possível usar a API diretamente:
+
+1. Criar/cadastrar credenciais em `POST /api/auth/cadastro`.
+2. Autenticar em `POST /api/auth/login`.
+3. Enviar o token retornado no header `Authorization: Bearer <token>`.
+
+---
+
+## Fonte da temperatura por registro
+
+Além da configuração global `USE_FAKE_PROVIDER`, o dashboard e a API aceitam a fonte desejada em cada novo registro.
+
+Exemplo para registrar temperatura por cidade usando OpenWeatherMap:
+
+```json
+{
+  "cidade": "Cascavel",
+  "fonte": "OpenWeatherMap"
+}
+```
+
+Valores aceitos para `fonte`:
+
+- `Simulado`: usa o provedor fake, sem chave externa.
+- `OpenWeatherMap`: consulta dados reais na OpenWeatherMap.
+
+Se `fonte` não for enviada, a API usa o padrão definido por `FeatureFlags:UseFakeProvider` / `USE_FAKE_PROVIDER`.
+
+---
+
+## Testes
+
+Para executar a suíte de testes a partir da raiz do repositório:
+
+```bash
+dotnet test tests/
+```
+
+Se você quiser manter a execução também dentro de Docker, use a imagem do SDK .NET e execute o mesmo comando dentro do container:
+
+```bash
+docker run --rm \
+  -v "$PWD:/workspace" \
+  -w /workspace \
+  mcr.microsoft.com/dotnet/sdk:8.0 \
+  dotnet test tests/
+```
+
+---
+
+## Arquitetura
+
+```text
+backend/src/         (Padrão comum de desenvolvimento em c#)
+├── Domain/          # Entidades e interfaces, sem dependências externas
+├── Application/     # Casos de uso, DTOs e contratos de serviço
+├── Infrastructure/  # EF Core, repositórios e providers de clima
+└── Api/             # Controllers, Program.cs, Swagger e filtros
+
+tests/
+├── Unit/            # Testes unitários dos serviços
+└── Integration/     # Testes de API com WebApplicationFactory
+
+frontend/
+└── src/
+    ├── components/  # Componentes Vue
+    ├── services/    # Cliente HTTP da API
+    └── App.vue      # Componente principal
+```
+
+### Decisões de design
+
+- **Clean Architecture** com separação entre domínio, aplicação, infraestrutura e API.
+- **Docker Compose como caminho principal de execução**, orquestrando frontend, API e banco de dados.
+- **Feature Flag** para definir o provedor padrão de clima sem recompilação (`FeatureFlags:UseFakeProvider`).
+- **JWT Bearer** para proteger endpoints de clima.
+- **BruteForceFilter** aplicado aos registros de clima sem autenticação, bloqueando excesso de tentativas em um endpoint, teria sido interessante em outras funcionalidade.
+- **Inicialização automática do banco**, aplicando migrations quando existirem ou criando o schema automaticamente.
+- **FakeWeatherProvider** como padrão para permitir execução sem API key externa, mas se tiver uma chave ele também funciona com a comunicação com o OpenWeatherAPI.
+- **Seleção por requisição** para registrar temperatura com `fonte: "Simulado"` ou `fonte: "OpenWeatherMap"`.
+
+---
+
+## Endpoints principais
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/auth/cadastro` | Cadastra usuário/senha para acesso ao sistema |
+| POST | `/api/auth/login` | Autentica usuário/senha e retorna JWT |
+| POST | `/api/clima/cidade` | Registra temperatura por cidade. Aceita `fonte` opcional: `Simulado` ou `OpenWeatherMap` |
+| POST | `/api/clima/coordenadas` | Registra temperatura por latitude/longitude. Aceita `fonte` opcional: `Simulado` ou `OpenWeatherMap` |
+| GET | `/api/clima/cidades` | Lista cidades com registros salvos para reutilização no dashboard |
+| GET | `/api/clima/historico/cidade/{cidade}` | Retorna histórico por cidade |
+| GET | `/api/clima/historico/coordenadas?latitude=&longitude=` | Retorna histórico por coordenadas |
+| GET | `/health` | Health check da API |
+| GET | `/swagger` | Documentação interativa da API |
+
+---
+
+## Solução de problemas
+
+### Porta já está em uso
+
+Se alguma porta estiver ocupada, pare o processo local ou ajuste o mapeamento no `docker-compose.yml`.
+
+### API não ficou saudável
+
+Verifique os logs:
+
+```bash
+docker compose logs api
+docker compose logs db
+```
+
+### Quero resetar o banco
+
+```bash
+docker compose down -v
+docker compose up -d
+```
