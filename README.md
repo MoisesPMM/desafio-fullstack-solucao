@@ -38,9 +38,13 @@ git clone <url-do-repositorio>
 cd Desafio
 ```
 
-### 2. Configure as variáveis de ambiente (opcional)
+### 2. Configure as variáveis de ambiente (obrigatório)
+
+Esse passo é muito importante, pois sem um .env na raiz do projeto contendo as variaveis como `JWT_SENHA` E `JWT_KEY`, o docker não vai conseguir subir as imagens, alegando erro de dependencias.
 
 O `docker-compose.yml` já possui valores padrão para subir a aplicação com o provedor simulado de clima (`USE_FAKE_PROVIDER=true`). Assim, é possível testar o projeto sem chave externa da OpenWeatherMap.
+
+`Observação:` Caso tente utilizar a função de consulta de clima tempo com o OpenWeatherAPI sem a chave, vai retornar erro de comunicação com o servidor/api.
 
 Se quiser personalizar credenciais ou usar dados reais da OpenWeatherMap, crie um arquivo `.env` na raiz do projeto:
 
