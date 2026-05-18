@@ -8,6 +8,10 @@ Aplicação full-stack para registro e consulta de temperaturas por cidade ou co
 
 O projeto entrega uma API em .NET, um frontend em Vue e um banco PostgreSQL. A forma recomendada de executar a aplicação é **somente com Docker Compose**, sem instalar dependências do backend ou frontend na máquina.
 
+A solução original foi feita em outro repositório no meu Perfil do github, localizado aqui `https://github.com/MoisesPMM/Desafio-FullStack`
+Devido a alguns problemas na hora de fazer o PR, eu fiz um fork limpo e subi os arquivos, mas nesse projeto mostra o histórico de commits que são cerca de 35 ou 40, e a evolução do projeto
+
+
 | Serviço | Porta local | Descrição |
 |---|---:|---|
 | Frontend | `3000` | Interface web para autenticação, cadastro e consulta de temperaturas |
@@ -201,7 +205,7 @@ frontend/
 - **Docker Compose como caminho principal de execução**, orquestrando frontend, API e banco de dados.
 - **Feature Flag** para definir o provedor padrão de clima sem recompilação (`FeatureFlags:UseFakeProvider`).
 - **JWT Bearer** para proteger endpoints de clima.
-- **BruteForceFilter** aplicado aos registros de clima sem autenticação, bloqueando excesso de tentativas em um endpoint, teria sido interessante em outras funcionalidade.
+- **BruteForceFilter** aplicado aos registros de clima sem autenticação, bloqueando excesso de tentativas em um endpoint, teria sido interessante em outras funcionalidades adicionais ou novas, somando com as que foram propostas no desafio.
 - **Inicialização automática do banco**, aplicando migrations quando existirem ou criando o schema automaticamente.
 - **FakeWeatherProvider** como padrão para permitir execução sem API key externa, mas se tiver uma chave ele também funciona com a comunicação com o OpenWeatherAPI.
 - **Seleção por requisição** para registrar temperatura com `fonte: "Simulado"` ou `fonte: "OpenWeatherMap"`.
